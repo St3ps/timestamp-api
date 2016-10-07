@@ -1,55 +1,40 @@
 var express = require('express');
 var app = express();
+var utils = require('./functions.js');
 
-function formatDate(date) {
-    
-    var d = {
-        
-        unix: Date.parse(date),
-        natural: date.toLocaleString("en-GB", { day:"numeric", month: "long", year:"numeric" }) 
-        
-    }
-    console.log(d);
-    return d;
 
-}
 
-function assertDate(date_parameter) {
-    
-    //if the request parameter is a full number, i'm having it considered as a unix parameter as far as the date is concerned
-    if (/^\d+$/.test(date_parameter)) {
-        
-        console.log("string is digits only, converting string to number and instantiating Date object");
-        return new Date(Number(date_parameter));
-        
-    } else {
-        
-        console.log("Date parameter is not a number, instantiating Date object and having it decide wether it's valid or not")
-        console.log(typeof(date_parameter));
-        return new Date(date_parameter);
-        
-    }
-    
-}
+
+
 
 app.all("*", function(req, res, next) {
-  res.writeHead(200, { "Content-Type": "text/plain" }); // work this out
+  res.writeHead(200, { "Content-Type": "application/json" }); // work this out
   next();
 });
+
+app.get('/', function(req,res,next) {
+    
+    res.end('Hi, go right ahead and insert your date parameters in the URL to obtain your timestamp');
+    next();
+    
+})
 
 app.get('/:date', function(req, res) {
     
     // acquire the parameters given in the url 
-    var date = assertDate(req.params.date);
+    var date = utils.assertDate(req.params.date);
     
     if(date.toString() === 'Invalid Date') 
     res.end('Invalid date requested -- check date parameters', req.params.date);
 
-    var dateObj = formatDate(date);
+    var dateObj = utils.formatDate(date);
 
     res.end(JSON.stringify(dateObj));
 
+
 });
+
+
 
 app.listen(process.env.PORT, function () {
     
